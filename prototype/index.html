@@ -19,6 +19,7 @@
   --ac-deep: #137AB3;
   --exp: #E5484D;
   --inc: #12A16B;
+  --warn: #C2560C;
   --font: 'IBM Plex Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --page: #101318; --page-fg: #A3AAB6; } }
@@ -131,6 +132,31 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--ac); outlin
 .mini-budget .bar { height: 6px; }
 .sel-head { align-items: flex-end; line-height: 1.5; }
 .add-day { flex: none; height: 36px; padding: 0 12px; border: 0; border-radius: 10px; background: var(--ac-soft); color: var(--ac-deep); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+.set-btn { height: 36px; padding: 0 12px; margin-right: 6px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); font-size: 13px; font-weight: 600; }
+.bhead { display: flex; gap: 12px; align-items: flex-start; }
+.bhead .grow { flex: 1; min-width: 0; }
+.big { margin: 2px 0 4px; font-size: 28px; font-weight: 700; letter-spacing: -0.03em; }
+.charslot.sm { position: static; transform: none; width: 56px; height: 56px; flex: none; font-size: 10px; }
+.gauge-wrap.sm { width: 220px; }
+.gauge-mid { position: absolute; left: 0; right: 0; bottom: 6px; display: flex; flex-direction: column; align-items: center; }
+.gauge-mid b { font-size: 24px; letter-spacing: -0.02em; }
+.gauge-mid span { font-size: 11.5px; color: var(--muted); }
+.brk { margin-top: 12px; background: var(--bg); border-radius: 14px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; }
+.brk div { display: flex; justify-content: space-between; }
+.brk span { color: var(--muted); }
+.brk .tot { border-top: 1px solid var(--line); padding-top: 7px; }
+.brk .tot span { color: var(--fg); font-weight: 600; }
+.pill-s { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; margin-left: 4px; }
+.pill-s.over { background: #FDECEC; color: #C2262B; }
+.pill-s.warn { background: #FEF1E6; color: var(--warn); }
+.cb.nob .mark { opacity: .75; }
+.st { font-size: 11.5px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: var(--ac-soft); color: var(--ac-deep); }
+.st.done { background: var(--track); color: var(--muted); }
+.inrow { display: flex; align-items: center; gap: 10px; font-size: 14.5px; }
+.inrow .grow { flex: 1; min-width: 0; }
+.inrow .field.num { width: 130px; text-align: right; flex: none; }
+.inrow > span:last-child { color: var(--muted); font-size: 13px; }
+.addfx { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, .8fr); gap: 6px; }
 .cell .n { color: var(--inc); font-weight: 600; }
 .ns { display: flex; align-items: center; gap: 10px; margin: 0 16px 14px; padding: 14px; border-radius: 18px; background: var(--card); border: 1.5px dashed var(--line); font-size: 14px; }
 .ns.on { border-style: solid; border-color: transparent; background: #E2F5EC; color: #0B6B47; }
@@ -284,8 +310,12 @@ var tx = [
   T('mine', 3, 'me', '카페', '혼자 카페', 6500, '토스 체크'), T('mine', 7, 'me', '쇼핑', '책 2권', 31000, '신한카드'), T('mine', 10, 'me', '용돈', '용돈', 300000, '국민은행', 'inc')
 ];
 var books = [
-  { id: 'home', name: '우리집 가계부', members: ['me', 'hw'], budget: 1500000, cats: { '식비': 400000, '쇼핑': 300000, '생활': 250000 } },
-  { id: 'mine', name: '지은 용돈', members: ['me'], budget: 300000, cats: { '카페': 60000, '쇼핑': 150000 } }
+  { id: 'home', name: '우리집 가계부', members: ['me', 'hw'], budget: 1500000, lastMonth: 1049300,
+    cats: { '식비': 400000, '쇼핑': 300000, '생활': 250000, '카페': 30000, '교통': 80000 },
+    limits: { me: 700000, hw: 700000 },
+    fixed: [{ name: '관리비', amt: 88600, day: 7, cat: '생활' }, { name: '넷플릭스', amt: 17000, day: 10, cat: '문화' }, { name: '정수기 렌탈', amt: 29900, day: 15, cat: '생활' }, { name: '통신비', amt: 98000, day: 20, cat: '생활' }, { name: '보험료', amt: 150000, day: 25, cat: '의료' }] },
+  { id: 'mine', name: '지은 용돈', members: ['me'], budget: 300000, lastMonth: 52000, cats: { '카페': 60000, '쇼핑': 150000 }, limits: {},
+    fixed: [{ name: '유튜브 프리미엄', amt: 14900, day: 18, cat: '문화' }] }
 ];
 var notis = [
   { who: 'hw', text: '현우님이 <b>이마트 장보기 47,250원</b>을 기록했어요', when: '10분 전', unread: true },
@@ -312,6 +342,14 @@ function book() { return books.filter(function (b) { return b.id === S.book; })[
 function shared() { return book().members.length > 1; }
 function wd(d) { return new Date(Y, M - 1, d).getDay(); }
 var WD = ['일', '월', '화', '수', '목', '금', '토'];
+function calc(b) {
+  var all = tx.filter(function (t) { return t.book === b.id; }), spent = sum(all, 'exp'), fixed = b.fixed || [];
+  var fixedTotal = fixed.reduce(function (a, f) { return a + f.amt; }, 0);
+  var upcoming = fixed.filter(function (f) { return f.day > TODAY; }).reduce(function (a, f) { return a + f.amt; }, 0);
+  var daysLeft = 31 - TODAY + 1, spendable = b.budget - spent - upcoming;
+  return { all: all, spent: spent, fixedTotal: fixedTotal, upcoming: upcoming, daysLeft: daysLeft, spendable: spendable,
+    perDay: Math.floor(Math.max(0, spendable) / daysLeft / 100) * 100, used: b.budget ? spent / b.budget * 100 : 0 };
+}
 function bookTx() { return tx.filter(function (t) { return t.book === S.book && (S.who === 'all' || t.who === S.who); }); }
 function sum(list, type) { return list.filter(function (t) { return t.type === type; }).reduce(function (a, t) { return a + t.amt; }, 0); }
 function av(id, cls) { var m = MEMBERS[id]; return '<span class="av ' + (cls || '') + '" style="background:' + m.color + '" aria-label="' + m.name + '">' + m.name[0] + '</span>'; }
@@ -383,13 +421,13 @@ function viewHome() {
       (di ? '<small class="i">+' + (di >= 1e6 ? (di / 1e4).toFixed(0) + '만' : won(di)) + '</small>' : '') + (noSpend[d] && !de ? '<small class="n">무지출</small>' : '') + (de ? '<small class="e">-' + (de >= 1e5 ? (de / 1e4).toFixed(1).replace('.0', '') + '만' : won(de)) + '</small>' : '') + '</button>';
   }
   var e = sum(list, 'exp'), i = sum(list, 'inc');
-  var spent = sum(all, 'exp'), used = spent / b.budget * 100, left = b.budget - spent, perDay = Math.max(0, left) / (31 - TODAY + 1);
+  var cc = calc(b), used = cc.used;
   var sel = S.calSel, selItems = list.filter(function (t) { return t.d === sel; }), se = sum(selItems, 'exp'), si = sum(selItems, 'inc');
   var h = '<div class="top"><button class="book-btn" data-act="open" data-v="books" aria-haspopup="dialog">' + esc(b.name) + I.down + '</button>' +
     '<button class="icon-btn" data-act="open" data-v="notis" aria-label="알림 ' + unread + '개">' + I.bell + (unread ? '<span class="badge">' + unread + '</span>' : '') + '</button></div>';
   h += '<div class="month"><button class="icon-btn" data-act="month" aria-label="이전 달">' + I.left + '</button><h1 class="title">' + Y + '년 ' + M + '월</h1><button class="icon-btn" data-act="month" aria-label="다음 달" style="transform:scaleX(-1)">' + I.left + '</button></div>';
   h += '<div class="sum3"><div><span>수입</span><b style="color:var(--inc)">' + won(i) + '</b></div><div><span>지출</span><b style="color:var(--exp)">' + won(e) + '</b></div><div><span>합계</span><b>' + (i - e >= 0 ? '+' : '') + won(i - e) + '</b></div></div>';
-  h += '<button class="mini-budget" data-act="tab" data-v="budget"><span class="grow"><span class="small muted">예산 ' + Math.round(used) + '% 사용 · ' + (left >= 0 ? '하루 ' + won(Math.floor(perDay / 100) * 100) + '원씩 쓸 수 있어요' : won(-left) + '원 초과') + '</span><span class="bar"><i style="width:' + Math.min(100, used).toFixed(1) + '%;background:' + (used > 100 ? 'var(--exp)' : 'var(--ac)') + '"></i></span></span>' + I.chev + '</button>';
+  h += '<button class="mini-budget" data-act="tab" data-v="budget"><span class="grow"><span class="small muted">예산 ' + Math.round(used) + '% 사용 · ' + (cc.spendable >= 0 ? '하루 ' + won(cc.perDay) + '원씩 쓸 수 있어요' : '쓸 수 있는 돈을 ' + won(-cc.spendable) + '원 넘었어요') + '</span><span class="bar"><i style="width:' + Math.min(100, used).toFixed(1) + '%;background:' + (used > 100 ? 'var(--exp)' : 'var(--ac)') + '"></i></span></span>' + I.chev + '</button>';
   h += memberChips();
   h += '<div class="cal"><div class="wk">' + WD.map(function (w) { return '<span>' + w + '</span>'; }).join('') + '</div><div class="grid">' + cells + '</div></div>';
   h += '<div class="day-head sel-head"><span><b>' + M + '월 ' + sel + '일 (' + WD[wd(sel)] + ')' + (sel === TODAY ? ' · 오늘' : '') + '</b><br>' + (si ? '<span style="color:var(--inc)">+' + won(si) + '</span> ' : '') + (se ? '-' + won(se) : (selItems.length ? '' : '내역 없음')) + '</span>' +
@@ -400,29 +438,75 @@ function viewHome() {
 }
 
 function viewBudget() {
-  var b = book(), list = bookTx(), all = tx.filter(function (t) { return t.book === S.book; });
-  var spent = sum(all, 'exp'), used = spent / b.budget * 100, ideal = TODAY / 31 * 100;
-  var left = b.budget - spent, perDay = Math.max(0, left) / (31 - TODAY + 1);
-  var h = '<div class="top"><h1 class="title" style="padding-left:6px">' + M + '월 예산</h1><span class="muted small" style="padding-right:8px">' + esc(b.name) + '</span></div>';
-  h += '<section class="card budget"><div style="display:flex;justify-content:space-between;gap:8px"><div><h1>현재 예산의<br><em>' + Math.round(used) + '%</em>를 사용했어요</h1>' +
-    '<p class="muted small" style="margin:4px 0 0">' + (left >= 0 ? '남은 ' + (31 - TODAY + 1) + '일 동안 하루 ' + won(Math.floor(perDay / 100) * 100) + '원씩 쓸 수 있어요' : won(-left) + '원 초과했어요') + '</p></div></div>' +
-    '<div class="gauge-wrap">' + gaugeSvg(used, ideal) + '<div class="charslot" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><circle cx="9" cy="10.5" r=".6" fill="currentColor"/><circle cx="15" cy="10.5" r=".6" fill="currentColor"/><path d="M9 14.5c1.6 1.4 4.4 1.4 6 0"/></svg>캐릭터</div></div>' +
+  var b = book(), c = calc(b), ideal = TODAY / 31 * 100;
+  var h = '<div class="top"><div style="padding-left:6px"><h1 class="title">' + M + '월 예산</h1><span class="muted small">' + esc(b.name) + '</span></div><button class="set-btn" data-act="openBudget">예산 설정</button></div>';
+  var diff = b.lastMonth - c.spent;
+  h += '<section class="card"><div class="bhead"><div class="grow"><p class="muted small" style="margin:0">고정지출까지 빼고, 실제로 쓸 수 있는 돈</p>' +
+    '<p class="big" style="color:' + (c.spendable < 0 ? 'var(--exp)' : 'var(--fg)') + '">' + (c.spendable >= 0 ? won(c.spendable) + '원' : won(-c.spendable) + '원 초과') + '</p>' +
+    '<p class="small" style="margin:0">' + (c.spendable >= 0 ? '남은 ' + c.daysLeft + '일 동안 하루 <b>' + won(c.perDay) + '원</b>씩 쓸 수 있어요' : '남은 고정지출을 내면 예산을 넘어요') + '</p></div>' +
+    '<div class="charslot sm" aria-hidden="true">캐릭터</div></div>' +
+    '<div class="gauge-wrap sm">' + gaugeSvg(c.used, ideal) + '<div class="gauge-mid"><b>' + Math.round(c.used) + '%</b><span>예산 사용</span></div></div>' +
     '<div class="legend"><i></i>오늘 기준 적정 사용률 ' + Math.round(ideal) + '%</div>' +
-    '<div class="trio"><div><span>남은 예산</span><b>' + won(left) + '</b></div><div><span>쓴 돈</span><b style="color:var(--exp)">' + won(spent) + '</b></div><div><span>예산</span><b>' + won(b.budget) + '</b></div></div></section>';
-  if (shared()) {
-    var parts = b.members.map(function (m) { return { m: m, v: sum(all.filter(function (t) { return t.who === m; }), 'exp') }; });
-    h += '<section class="card"><div class="card-head"><h2>누가 얼마 썼을까요</h2><button class="link" data-act="startSettle">정산하기</button></div>' +
-      '<div class="split" role="img" aria-label="멤버별 지출 비율">' + parts.map(function (p) { return '<i style="width:' + (p.v / spent * 100).toFixed(1) + '%;background:' + MEMBERS[p.m].color + '"></i>'; }).join('') + '</div>' +
-      parts.map(function (p) { return '<div class="split-row">' + av(p.m, 'sm') + '<span class="grow">' + MEMBERS[p.m].name + '</span><span class="muted small">' + Math.round(p.v / spent * 100) + '%</span><b>' + won(p.v) + '원</b></div>'; }).join('') + '</section>';
-  }
-  h += '<section class="card"><div class="card-head"><h2>카테고리 예산</h2><button class="link" data-act="tab" data-v="stats">전체 보기</button></div>' +
-    Object.keys(b.cats).map(function (c) {
-      var u = sum(all.filter(function (t) { return t.cat === c; }), 'exp'), lim = b.cats[c], p = u / lim * 100, over = u > lim;
-      return '<div class="cb"><div class="cb-top">' + mark(c) + '<span style="flex:1">' + c + '</span><b class="small" style="color:' + (over ? 'var(--exp)' : 'var(--fg)') + '">' + (over ? won(u - lim) + '원 초과' : Math.round(p) + '%') + '</b></div>' +
-        '<div class="bar"><i style="width:' + Math.min(100, p).toFixed(1) + '%;background:' + (over ? 'var(--exp)' : CATS[c].c) + '"></i></div>' +
-        '<div class="cb-sub"><span>' + won(u) + '원 사용</span><span>예산 ' + won(lim) + '원</span></div></div>';
+    '<div class="brk"><div><span>이번 달 예산</span><b>' + won(b.budget) + '원</b></div><div><span>쓴 돈</span><b style="color:var(--exp)">-' + won(c.spent) + '원</b></div>' +
+    '<div><span>아직 안 나간 고정지출</span><b>-' + won(c.upcoming) + '원</b></div><div class="tot"><span>쓸 수 있는 돈</span><b>' + won(c.spendable) + '원</b></div></div>' +
+    '<span class="tag" style="margin-top:12px">' + (diff >= 0 ? '지난달 이맘때보다 ' + won(diff) + '원 덜 썼어요' : '지난달 이맘때보다 ' + won(-diff) + '원 더 썼어요') + '</span></section>';
+  var rows = EXP_CATS.map(function (cat) {
+    var u = sum(c.all.filter(function (t) { return t.cat === cat; }), 'exp'), lim = b.cats[cat] || 0, p = lim ? u / lim * 100 : 0;
+    var st = !lim ? 3 : u > lim ? 0 : p >= 80 ? 1 : 2;
+    return { cat: cat, u: u, lim: lim, p: p, st: st };
+  }).filter(function (r) { return r.lim || r.u; }).sort(function (x, y) { return x.st - y.st || (x.st === 3 ? y.u - x.u : y.p - x.p); });
+  var nOver = rows.filter(function (r) { return r.st === 0; }).length, nWarn = rows.filter(function (r) { return r.st === 1; }).length;
+  h += '<section class="card"><div class="card-head"><h2>카테고리 예산</h2><span class="small">' + (nOver ? '<span class="pill-s over">초과 ' + nOver + '</span>' : '') + (nWarn ? '<span class="pill-s warn">주의 ' + nWarn + '</span>' : '') + '</span></div>' +
+    rows.map(function (r) {
+      var label = r.st === 0 ? '<b class="small" style="color:var(--exp)">' + won(r.u - r.lim) + '원 초과</b>' : r.st === 1 ? '<b class="small" style="color:var(--warn)">주의 · ' + Math.round(r.p) + '%</b>' : r.st === 2 ? '<b class="small">' + Math.round(r.p) + '%</b>' : '<span class="small muted">예산 없음</span>';
+      var bar = r.lim ? '<div class="bar"><i style="width:' + Math.min(100, r.p).toFixed(1) + '%;background:' + (r.st === 0 ? 'var(--exp)' : r.st === 1 ? 'var(--warn)' : CATS[r.cat].c) + '"></i></div>' : '';
+      var sub = r.lim ? '<div class="cb-sub"><span>' + won(r.u) + '원 사용</span><span>예산 ' + won(r.lim) + '원</span></div>' : '<div class="cb-sub"><span>' + won(r.u) + '원 사용</span><button class="link" style="padding:0;color:var(--ac-deep)" data-act="openBudget">예산 정하기</button></div>';
+      return '<div class="cb' + (r.st === 3 ? ' nob' : '') + '"><div class="cb-top">' + mark(r.cat) + '<span style="flex:1">' + r.cat + '</span>' + label + '</div>' + bar + sub + '</div>';
     }).join('') + '</section>';
+  var fx = (b.fixed || []).slice().sort(function (x, y) { return x.day - y.day; });
+  h += '<section class="card"><div class="card-head"><h2>고정지출</h2><span class="muted small">' + won(c.fixedTotal) + '원 중 ' + won(c.upcoming) + '원 남음</span></div>' +
+    (fx.length ? fx.map(function (f) {
+      var done = f.day <= TODAY;
+      return '<div class="crow">' + mark(f.cat) + '<span class="grow">' + esc(f.name) + '<br><span class="muted small">매달 ' + f.day + '일</span></span>' +
+        (done ? '<span class="st done">나갔어요</span>' : '<span class="st">D-' + (f.day - TODAY) + '</span>') + '<b style="min-width:76px;text-align:right">' + won(f.amt) + '</b></div>';
+    }).join('') : '<p class="empty">등록된 고정지출이 없어요</p>') +
+    '<p class="muted small" style="margin:8px 0 0">고정지출도 예산에 포함돼요. 아직 안 나간 금액은 쓸 수 있는 돈에서 미리 빼 두었어요.</p></section>';
+  if (shared()) {
+    h += '<section class="card"><div class="card-head"><h2>누가 얼마 썼을까요</h2><button class="link" data-act="startSettle">정산하기</button></div>' +
+      '<div class="split" role="img" aria-label="멤버별 지출 비율">' + b.members.map(function (m) { var v = sum(c.all.filter(function (t) { return t.who === m; }), 'exp'); return '<i style="width:' + (c.spent ? v / c.spent * 100 : 0).toFixed(1) + '%;background:' + MEMBERS[m].color + '"></i>'; }).join('') + '</div>' +
+      b.members.map(function (m) {
+        var v = sum(c.all.filter(function (t) { return t.who === m; }), 'exp'), lim = (b.limits || {})[m];
+        return '<div class="cb"><div class="cb-top">' + av(m, 'sm') + '<span style="flex:1">' + MEMBERS[m].name + '</span><b class="small">' + won(v) + '원</b></div>' +
+          (lim ? '<div class="bar"><i style="width:' + Math.min(100, v / lim * 100).toFixed(1) + '%;background:' + (v > lim ? 'var(--exp)' : MEMBERS[m].color) + '"></i></div><div class="cb-sub"><span>개인 한도 ' + won(lim) + '원</span><span>' + (v > lim ? won(v - lim) + '원 초과' : won(lim - v) + '원 남음') + '</span></div>' : '<div class="cb-sub"><span>한도 없음</span></div>') + '</div>';
+      }).join('') + '</section>';
+  }
   return h;
+}
+
+function bdSumText() {
+  var d = S.bd, cs = Object.keys(d.cats).reduce(function (a, k) { return a + (parseInt(d.cats[k], 10) || 0); }, 0), tot = parseInt(d.budget, 10) || 0;
+  var fx = d.fixed.reduce(function (a, f) { return a + f.amt; }, 0);
+  return '카테고리 합계 ' + won(cs) + '원 · 총예산 ' + won(tot) + '원' + (cs > tot ? '<br><b style="color:var(--exp)">카테고리 합계가 총예산보다 ' + won(cs - tot) + '원 많아요</b>' : '') +
+    (fx > tot ? '<br><b style="color:var(--exp)">고정지출(' + won(fx) + '원)이 총예산보다 많아요</b>' : '');
+}
+function fullBudget() {
+  var d = S.bd, b = book();
+  var num = function (key, k, val, ph) { return '<input class="field num" inputmode="numeric" data-input="' + key + '"' + (k ? ' data-k="' + k + '"' : '') + ' value="' + (val || '') + '" placeholder="' + ph + '" aria-label="' + (k ? (MEMBERS[k] ? MEMBERS[k].name : k) : '총예산') + '">'; };
+  var body = '<span class="label">한 달 총예산</span><div class="inrow">' + num('bdTotal', '', d.budget, '예: 1500000') + '<span>원</span></div>' +
+    '<span class="label">카테고리별 예산 <span class="muted" style="font-weight:400">· 비워 두면 예산 없음</span></span>' +
+    EXP_CATS.map(function (cat) { return '<div class="inrow">' + mark(cat) + '<span class="grow">' + cat + '</span>' + num('bdCat', cat, d.cats[cat], '예산 없음') + '<span>원</span></div>'; }).join('') +
+    '<p class="small muted" id="bd-sum" style="margin:0">' + bdSumText() + '</p>';
+  if (b.members.length > 1) body += '<span class="label">멤버별 개인 한도 <span class="muted" style="font-weight:400">· 선택</span></span>' +
+    b.members.map(function (m) { return '<div class="inrow">' + av(m, 'sm') + '<span class="grow">' + MEMBERS[m].name + '</span>' + num('bdLim', m, d.limits[m], '제한 없음') + '<span>원</span></div>'; }).join('');
+  body += '<span class="label">고정지출</span>' + d.fixed.map(function (f, i) {
+    return '<div class="inrow">' + mark(f.cat) + '<span class="grow">' + esc(f.name) + '<br><span class="muted small">매달 ' + f.day + '일 · ' + won(f.amt) + '원</span></span><button class="icon-btn" data-act="bdDelFixed" data-v="' + i + '" aria-label="' + esc(f.name) + ' 삭제">' + I.x + '</button></div>';
+  }).join('') +
+    '<div class="addfx"><input class="field" data-input="nfName" placeholder="이름 (예: 월세)" value="' + esc(d.nf.name) + '" aria-label="고정지출 이름">' +
+    '<input class="field num" inputmode="numeric" data-input="nfAmt" placeholder="금액" value="' + d.nf.amt + '" aria-label="고정지출 금액">' +
+    '<input class="field num" inputmode="numeric" data-input="nfDay" placeholder="매달 며칠" value="' + d.nf.day + '" aria-label="매달 며칠"></div>' +
+    '<button class="ghost" style="height:44px" data-act="bdAddFixed">+ 고정지출 추가</button>';
+  return '<div class="full" role="dialog" aria-label="예산 설정"><div class="bar-top"><button class="icon-btn" data-act="close" aria-label="닫기">' + I.x + '</button><h2 class="title">예산 설정</h2></div>' +
+    '<div class="body">' + body + '</div><div class="footer"><button class="primary" data-act="bdSave">저장하기</button></div></div>';
 }
 
 function viewStats() {
@@ -556,7 +640,7 @@ function render(keepScroll) {
     [['home', '홈', I.cal], ['budget', '예산', I.gauge.replace(/16/g, '24').replace('stroke-width="2"', 'stroke-width="1.8"')]].map(function (x) { return '<button data-act="tab" data-v="' + x[0] + '"' + (S.tab === x[0] ? ' aria-current="page"' : '') + '>' + x[2] + x[1] + '</button>'; }).join('') +
     '<button class="plus" data-act="openInput" aria-label="내역 추가">' + I.plus + '</button>' +
     [['stats', '통계', I.stat], ['my', '마이', I.me]].map(function (x) { return '<button data-act="tab" data-v="' + x[0] + '"' + (S.tab === x[0] ? ' aria-current="page"' : '') + '>' + x[2] + x[1] + '</button>'; }).join('') + '</nav>';
-  var over = { books: sheetBooks, newBook: sheetNewBook, invite: sheetInvite, notis: fullNotis, input: sheetInput, settle: fullSettle }[S.over];
+  var over = { budget: fullBudget, books: sheetBooks, newBook: sheetNewBook, invite: sheetInvite, notis: fullNotis, input: sheetInput, settle: fullSettle }[S.over];
   var po = app.querySelector('.sheet, .full .body'), overScroll = po && S.over === shownOver ? po.scrollTop : 0;
   app.innerHTML = '<div class="body">' + view + '</div>' + nav + (over ? over() : '') + (S.toast ? '<div class="toast" role="status">' + S.toast + '</div>' : '');
   var nb = app.querySelector('.body'); if (nb && keepScroll) nb.scrollTop = scrollKeep;
@@ -584,6 +668,24 @@ app.addEventListener('click', function (e) {
     case 'closeNotis': notis.forEach(function (n) { n.unread = false; }); S.over = null; break;
     case 'book': S.book = v; S.who = 'all'; S.over = null; toast(esc(book().name) + '(으)로 바꿨어요'); break;
     case 'calSel': S.calSel = +v; break;
+    case 'openBudget':
+      var bb = book();
+      S.bd = { budget: String(bb.budget), cats: {}, limits: {}, fixed: (bb.fixed || []).map(function (f) { return { name: f.name, amt: f.amt, day: f.day, cat: f.cat }; }), nf: { name: '', amt: '', day: '' } };
+      Object.keys(bb.cats).forEach(function (k) { S.bd.cats[k] = String(bb.cats[k]); });
+      Object.keys(bb.limits || {}).forEach(function (k) { S.bd.limits[k] = String(bb.limits[k]); });
+      S.over = 'budget'; break;
+    case 'bdDelFixed': S.bd.fixed.splice(+v, 1); break;
+    case 'bdAddFixed':
+      var nf = S.bd.nf, amt2 = parseInt(nf.amt, 10), day2 = parseInt(nf.day, 10);
+      if (!nf.name.trim() || !amt2 || !(day2 >= 1 && day2 <= 31)) { toast('이름, 금액, 날짜(1~31)를 모두 입력해 주세요'); break; }
+      S.bd.fixed.push({ name: nf.name.trim(), amt: amt2, day: day2, cat: '생활' }); S.bd.nf = { name: '', amt: '', day: '' }; break;
+    case 'bdSave':
+      var dd = S.bd, tot = parseInt(dd.budget, 10);
+      if (!tot) { toast('한 달 총예산을 입력해 주세요'); break; }
+      var tb = book(); tb.budget = tot; tb.cats = {}; tb.limits = {}; tb.fixed = dd.fixed;
+      Object.keys(dd.cats).forEach(function (k) { var n = parseInt(dd.cats[k], 10); if (n) tb.cats[k] = n; });
+      Object.keys(dd.limits).forEach(function (k) { var n = parseInt(dd.limits[k], 10); if (n) tb.limits[k] = n; });
+      S.over = null; toast('예산을 저장했어요'); break;
     case 'month': toast('예시 데이터는 10월만 있어요'); break;
     case 'ns': if (noSpend[v]) { delete noSpend[v]; toast('무지출 체크를 취소했어요'); } else { noSpend[v] = true; toast('무지출 데이! 콩 5개를 받았어요'); } break;
     case 'statTab': S.statTab = v; break;
@@ -632,6 +734,17 @@ app.addEventListener('input', function (e) {
   var k = e.target.dataset.input;
   if (k === 'memo') S.input.memo = e.target.value;
   if (k === 'nbName') S.newBook.name = e.target.value;
+  if (S.over === 'budget') {
+    var t = e.target, val = t.value;
+    if (t.classList.contains('num')) { val = val.replace(/\D/g, '').slice(0, 9); if (val !== t.value) t.value = val; }
+    if (k === 'bdTotal') S.bd.budget = val;
+    if (k === 'bdCat') S.bd.cats[t.dataset.k] = val;
+    if (k === 'bdLim') S.bd.limits[t.dataset.k] = val;
+    if (k === 'nfName') S.bd.nf.name = val;
+    if (k === 'nfAmt') S.bd.nf.amt = val;
+    if (k === 'nfDay') S.bd.nf.day = val;
+    var sumEl = document.getElementById('bd-sum'); if (sumEl) sumEl.innerHTML = bdSumText();
+  }
 });
 document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && S.over) { S.over = null; render(true); } });
 
