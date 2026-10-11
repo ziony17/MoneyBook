@@ -144,6 +144,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--ac); outlin
 .months .now { color: var(--fg); font-weight: 600; }
 .asset { display: flex; gap: 12px; align-items: center; }
 .asset .grow { flex: 1; min-width: 0; }
+.plan { display: inline-block; vertical-align: 2px; font-size: 10.5px; font-weight: 600; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 0 5px; margin-left: 4px; }
 .tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: var(--ac-soft); color: var(--ac-deep); }
 
 /* my page */
@@ -280,7 +281,7 @@ var notis = [
   { who: 'hw', text: '현우님이 <b>택시 16,000원</b>을 기록했어요', when: '어제' },
   { sys: 'alert', text: '<b>쇼핑</b> 예산을 넘었어요', when: '어제' },
   { who: 'hw', text: '현우님이 <b>9월 정산</b>을 요청했어요', when: '3일 전' },
-  { sys: 'gift', text: '7일 연속 기록! <b>콩 10개</b>를 받았어요', when: '4일 전' }
+  { sys: 'gift', text: '어제는 무지출 데이! <b>콩 5개</b>를 받았어요', when: '어제' }
 ];
 
 var S = {
@@ -425,13 +426,16 @@ function viewStats() {
 }
 
 function viewMy() {
+  var noSpend = 0;
+  for (var d = 1; d <= TODAY; d++) if (!tx.some(function (t) { return t.who === 'me' && t.type === 'exp' && t.d === d; })) noSpend++;
   var themeBtns = THEMES.map(function (t) {
     return '<button class="theme" data-act="theme" data-v="' + t.id + '" aria-pressed="' + (S.theme === t.id) + '"><span class="sw" style="background:linear-gradient(90deg,' + t.ac + ' 62%,' + t.ink + ' 62%)"></span>' + t.name + '<small>' + t.sub + '</small></button>';
   }).join('');
   function tog(k, label, sub) { return '<li><button data-act="alert" data-v="' + k + '" role="switch" aria-checked="' + S.alerts[k] + '"><span class="grow">' + label + '<br><span class="muted small">' + sub + '</span></span><span class="toggle" aria-checked="' + S.alerts[k] + '"></span></button></li>'; }
   return '<div class="top"><h1 class="title" style="padding-left:6px">마이페이지</h1><button class="icon-btn" data-act="open" data-v="notis" aria-label="알림">' + I.bell + '</button></div>' +
-    '<section class="card"><div class="profile">' + av('me') + '<div style="flex:1"><b style="font-size:17px">지은</b><br><span class="muted small">jieun@example.com</span></div><span class="tag">콩 128개</span></div>' +
-    '<div class="trio"><div><span>연속 기록</span><b>12일</b></div><div><span>이번 달 기록</span><b>' + tx.filter(function (t) { return t.who === 'me'; }).length + '건</b></div><div><span>이용권</span><b>무료</b></div></div></section>' +
+    '<section class="card"><div class="profile">' + av('me') + '<div style="flex:1"><b style="font-size:17px">지은</b> <span class="plan">무료</span><br><span class="muted small">jieun@example.com</span></div></div>' +
+    '<div class="trio"><div><span>내 무지출 데이</span><b>' + noSpend + '일</b></div><div><span>이번 달 기록</span><b>' + tx.filter(function (t) { return t.who === 'me'; }).length + '건</b></div><div><span>모은 콩</span><b>128개</b></div></div>' +
+    '<p class="muted small" style="margin:10px 0 0">돈을 안 쓴 날도 잘한 날이에요. 무지출 데이마다 콩을 받아요.</p></section>' +
     '<section class="card"><div class="card-head"><h2>내 가계부</h2></div><ul class="menu">' + books.map(function (b) {
       return '<li><button data-act="book" data-v="' + b.id + '"><span class="stack-av">' + b.members.map(function (m) { return av(m, 'sm'); }).join('') + '</span><span class="grow">' + esc(b.name) + '<br><span class="muted small">' + (b.members.length > 1 ? '함께 쓰는 중 · ' + b.members.length + '명' : '혼자 쓰는 중') + (b.id === S.book ? ' · 지금 보는 중' : '') + '</span></span>' + I.chev + '</button></li>';
     }).join('') + '<li><button data-act="open" data-v="newBook"><span class="sys" aria-hidden="true">' + I.plus.replace('26', '16').replace('26', '16') + '</span><span class="grow">새 가계부 만들기</span>' + I.chev + '</button></li></ul></section>' +
