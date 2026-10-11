@@ -119,12 +119,18 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--ac); outlin
 .wk, .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); text-align: center; }
 .wk span { font-size: 11.5px; color: var(--muted); padding: 4px 0; }
 .wk span:first-child { color: var(--exp); } .wk span:last-child { color: var(--ac-deep); }
-.cell { border: 0; background: transparent; border-radius: 12px; height: 58px; padding-top: 5px; display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.cell { border: 0; background: transparent; border-radius: 12px; height: 54px; padding-top: 5px; display: flex; flex-direction: column; align-items: center; gap: 1px; }
 .cell[aria-pressed="true"] { background: var(--ac-soft); }
 .cell .d { width: 24px; height: 24px; border-radius: 99px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
 .cell.today .d { background: var(--ac); color: var(--ac-ink); font-weight: 700; }
 .cell.future .d { color: var(--faint); }
 .cell small { font-size: 9.5px; line-height: 1.2; }
+.month { display: flex; align-items: center; justify-content: center; gap: 4px; margin: -6px 0 6px; }
+.mini-budget { display: flex; align-items: center; gap: 10px; width: calc(100% - 32px); margin: 0 16px 10px; padding: 10px 12px 12px 14px; border: 0; border-radius: 14px; background: var(--card); text-align: left; }
+.mini-budget .grow { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.mini-budget .bar { height: 6px; }
+.sel-head { align-items: flex-end; line-height: 1.5; }
+.add-day { flex: none; height: 36px; padding: 0 12px; border: 0; border-radius: 10px; background: var(--ac-soft); color: var(--ac-deep); font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
 .cell .n { color: var(--inc); font-weight: 600; }
 .ns { display: flex; align-items: center; gap: 10px; margin: 0 16px 14px; padding: 14px; border-radius: 18px; background: var(--card); border: 1.5px dashed var(--line); font-size: 14px; }
 .ns.on { border-style: solid; border-color: transparent; background: #E2F5EC; color: #0B6B47; }
@@ -367,12 +373,37 @@ function gaugeSvg(usedPct, idealPct) {
 }
 
 function viewHome() {
+  var b = book(), list = bookTx(), all = tx.filter(function (t) { return t.book === S.book; }), first = wd(1), cells = '';
+  var unread = notis.filter(function (n) { return n.unread; }).length;
+  for (var k = 0; k < first; k++) cells += '<span></span>';
+  for (var d = 1; d <= 31; d++) {
+    var items = list.filter(function (t) { return t.d === d; }), de = sum(items, 'exp'), di = sum(items, 'inc');
+    var cls = 'cell' + (d === TODAY ? ' today' : '') + (d > TODAY ? ' future' : '');
+    cells += '<button class="' + cls + '" data-act="calSel" data-v="' + d + '" aria-pressed="' + (S.calSel === d) + '" aria-label="' + M + '월 ' + d + '일' + (de ? ' 지출 ' + won(de) + '원' : '') + '"><span class="d">' + d + '</span>' +
+      (di ? '<small class="i">+' + (di >= 1e6 ? (di / 1e4).toFixed(0) + '만' : won(di)) + '</small>' : '') + (noSpend[d] && !de ? '<small class="n">무지출</small>' : '') + (de ? '<small class="e">-' + (de >= 1e5 ? (de / 1e4).toFixed(1).replace('.0', '') + '만' : won(de)) + '</small>' : '') + '</button>';
+  }
+  var e = sum(list, 'exp'), i = sum(list, 'inc');
+  var spent = sum(all, 'exp'), used = spent / b.budget * 100, left = b.budget - spent, perDay = Math.max(0, left) / (31 - TODAY + 1);
+  var sel = S.calSel, selItems = list.filter(function (t) { return t.d === sel; }), se = sum(selItems, 'exp'), si = sum(selItems, 'inc');
+  var h = '<div class="top"><button class="book-btn" data-act="open" data-v="books" aria-haspopup="dialog">' + esc(b.name) + I.down + '</button>' +
+    '<button class="icon-btn" data-act="open" data-v="notis" aria-label="알림 ' + unread + '개">' + I.bell + (unread ? '<span class="badge">' + unread + '</span>' : '') + '</button></div>';
+  h += '<div class="month"><button class="icon-btn" data-act="month" aria-label="이전 달">' + I.left + '</button><h1 class="title">' + Y + '년 ' + M + '월</h1><button class="icon-btn" data-act="month" aria-label="다음 달" style="transform:scaleX(-1)">' + I.left + '</button></div>';
+  h += '<div class="sum3"><div><span>수입</span><b style="color:var(--inc)">' + won(i) + '</b></div><div><span>지출</span><b style="color:var(--exp)">' + won(e) + '</b></div><div><span>합계</span><b>' + (i - e >= 0 ? '+' : '') + won(i - e) + '</b></div></div>';
+  h += '<button class="mini-budget" data-act="tab" data-v="budget"><span class="grow"><span class="small muted">예산 ' + Math.round(used) + '% 사용 · ' + (left >= 0 ? '하루 ' + won(Math.floor(perDay / 100) * 100) + '원씩 쓸 수 있어요' : won(-left) + '원 초과') + '</span><span class="bar"><i style="width:' + Math.min(100, used).toFixed(1) + '%;background:' + (used > 100 ? 'var(--exp)' : 'var(--ac)') + '"></i></span></span>' + I.chev + '</button>';
+  h += memberChips();
+  h += '<div class="cal"><div class="wk">' + WD.map(function (w) { return '<span>' + w + '</span>'; }).join('') + '</div><div class="grid">' + cells + '</div></div>';
+  h += '<div class="day-head sel-head"><span><b>' + M + '월 ' + sel + '일 (' + WD[wd(sel)] + ')' + (sel === TODAY ? ' · 오늘' : '') + '</b><br>' + (si ? '<span style="color:var(--inc)">+' + won(si) + '</span> ' : '') + (se ? '-' + won(se) : (selItems.length ? '' : '내역 없음')) + '</span>' +
+    '<button class="add-day" data-act="openInput">' + I.plus.replace(/26/g, '16') + '이 날 기록하기</button></div>';
+  h += selItems.length ? '<div class="list">' + selItems.map(txRow).join('') + '</div>' : '';
+  h += noSpendBox(sel);
+  return h;
+}
+
+function viewBudget() {
   var b = book(), list = bookTx(), all = tx.filter(function (t) { return t.book === S.book; });
   var spent = sum(all, 'exp'), used = spent / b.budget * 100, ideal = TODAY / 31 * 100;
   var left = b.budget - spent, perDay = Math.max(0, left) / (31 - TODAY + 1);
-  var unread = notis.filter(function (n) { return n.unread; }).length;
-  var h = '<div class="top"><button class="book-btn" data-act="open" data-v="books" aria-haspopup="dialog">' + esc(b.name) + I.down + '</button>' +
-    '<button class="icon-btn" data-act="open" data-v="notis" aria-label="알림 ' + unread + '개">' + I.bell + (unread ? '<span class="badge">' + unread + '</span>' : '') + '</button></div>';
+  var h = '<div class="top"><h1 class="title" style="padding-left:6px">' + M + '월 예산</h1><span class="muted small" style="padding-right:8px">' + esc(b.name) + '</span></div>';
   h += '<section class="card budget"><div style="display:flex;justify-content:space-between;gap:8px"><div><h1>현재 예산의<br><em>' + Math.round(used) + '%</em>를 사용했어요</h1>' +
     '<p class="muted small" style="margin:4px 0 0">' + (left >= 0 ? '남은 ' + (31 - TODAY + 1) + '일 동안 하루 ' + won(Math.floor(perDay / 100) * 100) + '원씩 쓸 수 있어요' : won(-left) + '원 초과했어요') + '</p></div></div>' +
     '<div class="gauge-wrap">' + gaugeSvg(used, ideal) + '<div class="charslot" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><circle cx="9" cy="10.5" r=".6" fill="currentColor"/><circle cx="15" cy="10.5" r=".6" fill="currentColor"/><path d="M9 14.5c1.6 1.4 4.4 1.4 6 0"/></svg>캐릭터</div></div>' +
@@ -391,27 +422,7 @@ function viewHome() {
         '<div class="bar"><i style="width:' + Math.min(100, p).toFixed(1) + '%;background:' + (over ? 'var(--exp)' : CATS[c].c) + '"></i></div>' +
         '<div class="cb-sub"><span>' + won(u) + '원 사용</span><span>예산 ' + won(lim) + '원</span></div></div>';
     }).join('') + '</section>';
-  h += memberChips();
-  var days = [TODAY, TODAY - 1, TODAY - 2].map(function (d) { return dayBlock(d, list); }).join('');
-  h += noSpendBox(TODAY) + (days || '<div class="list"><p class="empty">최근 내역이 없어요</p></div>');
   return h;
-}
-
-function viewCal() {
-  var list = bookTx(), first = wd(1), cells = '';
-  for (var b = 0; b < first; b++) cells += '<span></span>';
-  for (var d = 1; d <= 31; d++) {
-    var items = list.filter(function (t) { return t.d === d; }), e = sum(items, 'exp'), i = sum(items, 'inc');
-    var cls = 'cell' + (d === TODAY ? ' today' : '') + (d > TODAY ? ' future' : '');
-    cells += '<button class="' + cls + '" data-act="calSel" data-v="' + d + '" aria-pressed="' + (S.calSel === d) + '" aria-label="' + M + '월 ' + d + '일' + (e ? ' 지출 ' + won(e) + '원' : '') + '"><span class="d">' + d + '</span>' +
-      (i ? '<small class="i">+' + (i >= 1e6 ? (i / 1e4).toFixed(0) + '만' : won(i)) + '</small>' : '') + (noSpend[d] ? '<small class="n">무지출</small>' : '') + (e ? '<small class="e">-' + (e >= 1e5 ? (e / 1e4).toFixed(1).replace('.0', '') + '만' : won(e)) + '</small>' : '') + '</button>';
-  }
-  var e = sum(list, 'exp'), i = sum(list, 'inc');
-  return '<div class="top"><h1 class="title" style="padding-left:6px">' + Y + '년 ' + M + '월</h1></div>' +
-    '<div class="sum3"><div><span>수입</span><b style="color:var(--inc)">' + won(i) + '</b></div><div><span>지출</span><b style="color:var(--exp)">' + won(e) + '</b></div><div><span>합계</span><b>' + (i - e >= 0 ? '+' : '') + won(i - e) + '</b></div></div>' +
-    memberChips() +
-    '<div class="cal"><div class="wk">' + WD.map(function (w) { return '<span>' + w + '</span>'; }).join('') + '</div><div class="grid">' + cells + '</div></div>' +
-    (dayBlock(S.calSel, list) || '<div class="day-head"><b>' + M + '월 ' + S.calSel + '일 (' + WD[wd(S.calSel)] + ')</b></div><div class="list"><p class="empty">내역이 없어요</p></div>') + noSpendBox(S.calSel);
 }
 
 function viewStats() {
@@ -500,7 +511,7 @@ function sheetInput() {
     (shared() ? '<span class="label">누가 썼나요</span><div class="pills">' + book().members.map(function (m) { return '<button class="pill" data-act="inWho" data-v="' + m + '" aria-pressed="' + (s.who === m) + '">' + av(m, 'sm') + MEMBERS[m].name + '</button>'; }).join('') + '</div>' : '') +
     '<span class="label">결제수단</span><div class="pills">' + PAYS.map(function (p) { return '<button class="pill" data-act="inPay" data-v="' + p + '" aria-pressed="' + (s.pay === p) + '">' + p + '</button>'; }).join('') + '</div>' +
     '<div class="keys">' + keys.map(function (k) { return '<button data-act="key" data-v="' + k + '" aria-label="' + (k === 'del' ? '지우기' : k) + '">' + (k === 'del' ? I.del : k) + '</button>'; }).join('') + '</div>' +
-    '<button class="primary" data-act="save"' + (n ? '' : ' disabled') + '>' + M + '월 ' + TODAY + '일에 저장하기</button></div></div>';
+    '<button class="primary" data-act="save"' + (n ? '' : ' disabled') + '>' + M + '월 ' + s.day + '일에 저장하기</button></div></div>';
 }
 
 function fullSettle() {
@@ -540,9 +551,9 @@ var scrollKeep = 0, shownOver = null;
 function render(keepScroll) {
   var prev = app.querySelector('.body');
   scrollKeep = keepScroll && prev ? prev.scrollTop : 0;
-  var view = { home: viewHome, cal: viewCal, stats: viewStats, my: viewMy }[S.tab]();
+  var view = { home: viewHome, budget: viewBudget, stats: viewStats, my: viewMy }[S.tab]();
   var nav = '<nav class="nav" aria-label="주요 메뉴">' +
-    [['home', '홈', I.home], ['cal', '달력', I.cal]].map(function (x) { return '<button data-act="tab" data-v="' + x[0] + '"' + (S.tab === x[0] ? ' aria-current="page"' : '') + '>' + x[2] + x[1] + '</button>'; }).join('') +
+    [['home', '홈', I.cal], ['budget', '예산', I.gauge.replace(/16/g, '24').replace('stroke-width="2"', 'stroke-width="1.8"')]].map(function (x) { return '<button data-act="tab" data-v="' + x[0] + '"' + (S.tab === x[0] ? ' aria-current="page"' : '') + '>' + x[2] + x[1] + '</button>'; }).join('') +
     '<button class="plus" data-act="openInput" aria-label="내역 추가">' + I.plus + '</button>' +
     [['stats', '통계', I.stat], ['my', '마이', I.me]].map(function (x) { return '<button data-act="tab" data-v="' + x[0] + '"' + (S.tab === x[0] ? ' aria-current="page"' : '') + '>' + x[2] + x[1] + '</button>'; }).join('') + '</nav>';
   var over = { books: sheetBooks, newBook: sheetNewBook, invite: sheetInvite, notis: fullNotis, input: sheetInput, settle: fullSettle }[S.over];
@@ -573,6 +584,7 @@ app.addEventListener('click', function (e) {
     case 'closeNotis': notis.forEach(function (n) { n.unread = false; }); S.over = null; break;
     case 'book': S.book = v; S.who = 'all'; S.over = null; toast(esc(book().name) + '(으)로 바꿨어요'); break;
     case 'calSel': S.calSel = +v; break;
+    case 'month': toast('예시 데이터는 10월만 있어요'); break;
     case 'ns': if (noSpend[v]) { delete noSpend[v]; toast('무지출 체크를 취소했어요'); } else { noSpend[v] = true; toast('무지출 데이! 콩 5개를 받았어요'); } break;
     case 'statTab': S.statTab = v; break;
     case 'theme': S.theme = v; applyTheme(); if (v !== 'sky') toast('미리보기 중이에요. 정식 앱에서는 콩으로 열 수 있어요'); break;
@@ -587,7 +599,7 @@ app.addEventListener('click', function (e) {
       var done = function () { toast('초대 코드를 복사했어요'); };
       try { navigator.clipboard.writeText('MB-4821').then(done, function () { toast('코드: MB-4821'); }); } catch (err) { toast('코드: MB-4821'); }
       S.over = null; break;
-    case 'openInput': S.input = { type: 'exp', digits: '', cat: '식비', pay: '신한카드', who: 'me', memo: '' }; S.over = 'input'; break;
+    case 'openInput': S.input = { type: 'exp', digits: '', cat: '식비', pay: '신한카드', who: 'me', memo: '', day: S.tab === 'home' ? S.calSel : TODAY }; S.over = 'input'; break;
     case 'inType': S.input.type = v; S.input.cat = v === 'inc' ? '월급' : '식비'; break;
     case 'inCat': S.input.cat = v; break;
     case 'inPay': S.input.pay = v; break;
@@ -599,9 +611,9 @@ app.addEventListener('click', function (e) {
     case 'save':
       var s = S.input, amt = parseInt(s.digits, 10);
       if (!amt) return;
-      tx.push(T(S.book, TODAY, shared() ? s.who : 'me', s.type === 'move' ? '기타' : s.cat, s.memo.trim() || (s.type === 'move' ? '이체' : s.cat), amt, s.pay, s.type === 'inc' ? 'inc' : 'exp'));
-      if (s.type !== 'inc' && (shared() ? s.who : 'me') === 'me') delete noSpend[TODAY];
-      S.over = null; S.calSel = TODAY;
+      tx.push(T(S.book, s.day, shared() ? s.who : 'me', s.type === 'move' ? '기타' : s.cat, s.memo.trim() || (s.type === 'move' ? '이체' : s.cat), amt, s.pay, s.type === 'inc' ? 'inc' : 'exp'));
+      if (s.type !== 'inc' && (shared() ? s.who : 'me') === 'me') delete noSpend[s.day];
+      S.over = null; S.calSel = s.day;
       toast(shared() ? '저장했어요. 함께 쓰는 가족에게 알림이 갔어요' : '저장했어요'); break;
     case 'startSettle':
       if (!shared()) { S.book = 'home'; S.who = 'all'; }
