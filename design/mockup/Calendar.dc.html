@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>달력</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#16171A;text-decoration:none}a:hover{color:#000}
+button{font:inherit;color:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #F5F6F8; color: #16171A; font-family: 'IBM Plex Sans KR', sans-serif; font-variant-numeric: tabular-nums; display: flex; flex-direction: column">
+
+<div style="background: #FFFFFF; border-radius: 0 0 24px 24px; padding-bottom: 14px">
+<header style="display: flex; align-items: center; justify-content: space-between; padding: 14px 12px 6px 12px">
+<div style="display: flex; align-items: center; gap: 2px">
+<button type="button" aria-label="이전 달" style="width: 44px; height: 44px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"></path></svg>
+</button>
+<h1 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em">2026년 10월</h1>
+<button type="button" aria-label="다음 달" style="width: 44px; height: 44px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+</button>
+</div>
+</header>
+
+<div style="margin: 0 16px 10px 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<div style="display: flex; flex-direction: column; gap: 1px; padding: 10px 12px; border-radius: 12px; background: #F5F6F8">
+<span style="font-size: 12px; color: #5F6168">수입</span>
+<span style="font-size: 14px; font-weight: 700; color: #2457C5">3,200,000</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 1px; padding: 10px 12px; border-radius: 12px; background: #F5F6F8">
+<span style="font-size: 12px; color: #5F6168">지출</span>
+<span style="font-size: 14px; font-weight: 700; color: #D63B26">1,087,700</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 1px; padding: 10px 12px; border-radius: 12px; background: #F5F6F8">
+<span style="font-size: 12px; color: #5F6168">합계</span>
+<span style="font-size: 14px; font-weight: 700">+2,112,300</span>
+</div>
+</div>
+
+<div style="padding: 0 10px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); font-size: 12px; text-align: center; padding-bottom: 4px">
+<span style="color: #D63B26">일</span><span style="color: #5F6168">월</span><span style="color: #5F6168">화</span><span style="color: #5F6168">수</span><span style="color: #5F6168">목</span><span style="color: #5F6168">금</span><span style="color: #2457C5">토</span>
+</div>
+<div style="padding: 0 10px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px">
+<sc-for list="{{cells}}" as="c" hint-placeholder-count="35">
+<button type="button" onClick="{{c.pick}}" disabled="{{c.blank}}" aria-label="{{c.aria}}" style="height: 60px; border: 0; border-radius: 12px; padding: 6px 0 0 0; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; background: {{c.bg}}; opacity: {{c.opacity}}">
+<span style="width: 24px; height: 24px; border-radius: 99px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; background: {{c.dayBg}}; color: {{c.dayFg}}">{{c.day}}</span>
+<span style="font-size: 10px; font-weight: 600; color: #2457C5; line-height: 1.2">{{c.inc}}</span>
+<span style="font-size: 10px; font-weight: 500; color: #D63B26; line-height: 1.2">{{c.exp}}</span>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="flex: 1; padding: 16px 16px 96px 16px; overflow: hidden; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; padding: 0 4px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">{{selLabel}}</h2>
+<span style="font-size: 13px; color: #5F6168">{{selTotal}}</span>
+</div>
+<div style="background: #FFFFFF; border-radius: 18px; padding: 4px 14px">
+<sc-for list="{{selItems}}" as="t" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px 0">
+<div style="width: 38px; height: 38px; flex: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; background: {{t.tint}}; color: {{t.color}}">{{t.mark}}</div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+<span style="font-size: 15px; font-weight: 500">{{t.title}}</span>
+<span style="font-size: 13px; color: #5F6168">{{t.sub}}</span>
+</div>
+<span style="font-size: 15px; font-weight: 600; color: {{t.amountColor}}">{{t.amount}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+
+<nav aria-label="주요 메뉴" style="position: absolute; left: 0; right: 0; bottom: 0; height: 82px; padding-bottom: 14px; background: #FFFFFF; border-top: 1px solid #E6E8EC; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center">
+<a href="Main.dc.html" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: #6B6E75">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"></path></svg>홈</a>
+<a href="Calendar.dc.html" aria-current="page" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; font-weight: 600; color: #16171A">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="2.5"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>달력</a>
+<a href="Input.dc.html" aria-label="내역 추가" style="justify-self: center; width: 54px; height: 54px; margin-top: -18px; border-radius: 99px; background: #DD4428; color: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px #DD442855">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+</a>
+<a href="Stats.dc.html" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: #6B6E75">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20v-8M12 20V5M19 20v-5"></path></svg>통계</a>
+<button type="button" style="height: 100%; border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: #6B6E75; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg>더보기</button>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+var CATS = {
+  '식비': { mark: '식', color: '#C4612A', tint: '#E07A3F1F' },
+  '카페': { mark: '카', color: '#875A40', tint: '#9A6B4F1F' },
+  '교통': { mark: '교', color: '#2F5FC4', tint: '#3A6FD81F' },
+  '쇼핑': { mark: '쇼', color: '#7448BD', tint: '#8A5CD11F' },
+  '생활': { mark: '생', color: '#21806F', tint: '#2E9A8A1F' },
+  '문화': { mark: '문', color: '#B83D69', tint: '#D04F7D1F' },
+  '의료': { mark: '의', color: '#4E7A2E', tint: '#5E8C3A1F' },
+  '수입': { mark: '+', color: '#2457C5', tint: '#2457C51A' }
+};
+var EXP = { 1: 48200, 2: 126500, 3: 62000, 4: 18400, 5: 215300, 6: 34900, 7: 88600, 8: 142700, 9: 71250, 10: 264600, 11: 15250 };
+var INC = { 10: 3200000 };
+var WD = ['일', '월', '화', '수', '목', '금', '토'];
+function won(n) { return (n > 0 ? '+' : '-') + Math.abs(n).toLocaleString('ko-KR'); }
+function man(n) { var v = n / 10000; return (v >= 100 ? Math.round(v) : Math.round(v * 10) / 10) + '만'; }
+function row(title, cat, pay, amt) {
+  var c = CATS[cat];
+  return { title: title, sub: cat + ' · ' + pay, mark: c.mark, color: c.color, tint: c.tint, amount: won(amt), amountColor: amt > 0 ? '#2457C5' : '#16171A' };
+}
+var DETAIL = {
+  11: [row('점심 김치찌개', '식비', '신한카드', -9000), row('스타벅스 아메리카노', '카페', '현대카드', -4700), row('지하철', '교통', '토스 체크', -1550)],
+  10: [row('10월 월급', '수입', '국민은행', 3200000), row('겨울 아우터', '쇼핑', '현대카드', -189000), row('쿠팡 생필품', '생활', '신한카드', -32800), row('친구 저녁', '식비', '신한카드', -25800), row('넷플릭스', '문화', '현대카드', -17000)],
+  9: [row('이마트 장보기', '생활', '신한카드', -47250), row('택시', '교통', '토스 체크', -16000), row('약국', '의료', '현금', -8000)]
+};
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { sel: 10 };
+  }
+  renderVals() {
+    var self = this, sel = this.state.sel, cells = [];
+    for (var b = 0; b < 4; b++) cells.push({ blank: true, day: '', inc: '', exp: '', aria: '빈 칸', bg: 'transparent', opacity: '0', dayBg: 'transparent', dayFg: '#16171A', pick: function () {} });
+    for (var d = 1; d <= 31; d++) {
+      (function (day) {
+        var wd = (day + 3) % 7, isToday = day === 11, isSel = day === sel;
+        cells.push({
+          blank: false, day: String(day),
+          inc: INC[day] ? '+' + man(INC[day]) : '',
+          exp: EXP[day] ? '-' + man(EXP[day]) : '',
+          aria: '10월 ' + day + '일',
+          bg: isSel ? '#FFF1EE' : 'transparent', opacity: '1',
+          dayBg: isToday ? '#DD4428' : 'transparent',
+          dayFg: isToday ? '#FFFFFF' : (wd === 0 ? '#D63B26' : (wd === 6 ? '#2457C5' : (day > 11 ? '#9A9CA1' : '#16171A'))),
+          pick: function () { self.setState({ sel: day }); }
+        });
+      })(d);
+    }
+    var wd = WD[(sel + 3) % 7];
+    var items = DETAIL[sel] || (EXP[sel] ? [row('지출 합계', '생활', '여러 결제수단', -EXP[sel])] : []);
+    var total = (EXP[sel] ? '-' + EXP[sel].toLocaleString('ko-KR') + '원' : '내역 없음');
+    return { cells: cells, selLabel: '10월 ' + sel + '일 (' + wd + ')', selTotal: total, selItems: items };
+  }
+}
+</script>
+</body>
+</html>

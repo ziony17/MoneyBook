@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>내역 입력</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#16171A;text-decoration:none}a:hover{color:#000}
+button,input{font:inherit;color:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #FFFFFF; color: #16171A; font-family: 'IBM Plex Sans KR', sans-serif; font-variant-numeric: tabular-nums; display: flex; flex-direction: column; gap: 10px; padding-bottom: 16px">
+
+<header style="display: flex; align-items: center; justify-content: space-between; padding: 8px 8px 0 8px; height: 56px">
+<a href="Main.dc.html" aria-label="닫기" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg>
+</a>
+<h1 style="margin: 0; font-size: 17px; font-weight: 600">내역 추가</h1>
+<button type="button" style="height: 36px; padding: 0 12px; border: 1px solid #E6E8EC; border-radius: 99px; background: #FFFFFF; display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 500; cursor: pointer">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="12" height="17" rx="2"></rect><path d="M9 3h6v3H9z"></path></svg>문자 붙여넣기</button>
+</header>
+
+<div role="tablist" aria-label="내역 종류" style="margin: 0 16px; padding: 4px; border-radius: 14px; background: #F0F1F4; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px">
+<sc-for list="{{types}}" as="s" hint-placeholder-count="3">
+<button type="button" role="tab" aria-selected="{{s.on}}" onClick="{{s.pick}}" style="height: 38px; border: 0; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; background: {{s.bg}}; color: {{s.fg}}; box-shadow: {{s.shadow}}">{{s.label}}</button>
+</sc-for>
+</div>
+
+<div style="padding: 6px 24px 0 24px; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; color: #5F6168">금액</span>
+<div style="display: flex; align-items: baseline; gap: 4px">
+<span style="font-size: 40px; font-weight: 700; letter-spacing: -0.03em; color: {{amountColor}}">{{amountText}}</span>
+<span style="font-size: 24px; font-weight: 600; color: {{amountColor}}">원</span>
+</div>
+</div>
+
+<div style="margin: 0 16px; display: flex; gap: 8px">
+<button type="button" style="height: 44px; padding: 0 12px; border: 0; border-radius: 12px; background: #F0F1F4; font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer">10.11 (일) 12:40</button>
+<label style="flex: 1; min-width: 0; height: 44px; border-radius: 12px; background: #F0F1F4; display: flex; align-items: center; padding: 0 12px">
+<span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">메모</span>
+<input type="text" placeholder="메모 (예: 점심 김치찌개)" style="width: 100%; border: 0; background: transparent; font-size: 14px; outline: none">
+</label>
+</div>
+
+<div style="margin: 2px 16px 0 16px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{cats}}" as="c" hint-placeholder-count="8">
+<button type="button" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="height: 62px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; font-size: 12px; font-weight: 500; background: {{c.bg}}; border: {{c.border}}">
+<span style="width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; background: {{c.tint}}; color: {{c.color}}">{{c.mark}}</span>
+{{c.name}}</button>
+</sc-for>
+</div>
+
+<div style="margin: 0 16px; display: flex; gap: 6px; overflow: hidden">
+<sc-for list="{{pays}}" as="p" hint-placeholder-count="4">
+<button type="button" onClick="{{p.pick}}" aria-pressed="{{p.on}}" style="height: 36px; padding: 0 14px; border-radius: 99px; font-size: 13px; font-weight: 500; white-space: nowrap; cursor: pointer; background: {{p.bg}}; color: {{p.fg}}; border: {{p.border}}">{{p.name}}</button>
+</sc-for>
+</div>
+
+<div style="flex: 1"></div>
+
+<div style="margin: 0 16px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{keys}}" as="k" hint-placeholder-count="12">
+<button type="button" onClick="{{k.press}}" aria-label="{{k.aria}}" style="height: 46px; border: 0; border-radius: 12px; background: #F5F6F8; font-size: 20px; font-weight: 500; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<sc-if value="{{k.isDel}}" hint-placeholder-val="{{false}}">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h11v14H9l-6-7z"></path><path d="m12 9 5 6M17 9l-5 6"></path></svg>
+</sc-if>
+<sc-if value="{{k.isNum}}" hint-placeholder-val="{{true}}">{{k.label}}</sc-if>
+</button>
+</sc-for>
+</div>
+
+<a href="Main.dc.html" style="margin: 0 16px; height: 54px; border-radius: 16px; background: #DD4428; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600">저장하기</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+var CATS = [
+  { name: '식비', mark: '식', color: '#C4612A', tint: '#E07A3F1F' },
+  { name: '카페', mark: '카', color: '#875A40', tint: '#9A6B4F1F' },
+  { name: '교통', mark: '교', color: '#2F5FC4', tint: '#3A6FD81F' },
+  { name: '쇼핑', mark: '쇼', color: '#7448BD', tint: '#8A5CD11F' },
+  { name: '생활', mark: '생', color: '#21806F', tint: '#2E9A8A1F' },
+  { name: '문화', mark: '문', color: '#B83D69', tint: '#D04F7D1F' },
+  { name: '의료', mark: '의', color: '#4E7A2E', tint: '#5E8C3A1F' },
+  { name: '기타', mark: '기', color: '#5F6168', tint: '#8A8D931F' }
+];
+var PAYS = ['신한카드', '현대카드', '토스 체크', '현금'];
+var TYPES = [
+  { label: '지출', bg: '#FFFFFF', fg: '#D63B26', amount: '#D63B26' },
+  { label: '수입', bg: '#FFFFFF', fg: '#2457C5', amount: '#2457C5' },
+  { label: '이체', bg: '#FFFFFF', fg: '#16171A', amount: '#16171A' }
+];
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { type: 0, digits: '9000', cat: '식비', pay: '신한카드' };
+  }
+  press(key) {
+    var d = this.state.digits;
+    if (key === 'del') d = d.slice(0, -1);
+    else if (d.length < 10) d = (d === '' && (key === '0' || key === '00')) ? '' : d + key;
+    this.setState({ digits: d });
+  }
+  renderVals() {
+    var self = this, st = this.state;
+    var t = TYPES[st.type];
+    var n = st.digits === '' ? 0 : parseInt(st.digits, 10);
+    var keyList = ['1','2','3','4','5','6','7','8','9','00','0','del'];
+    return {
+      amountText: n.toLocaleString('ko-KR'),
+      amountColor: n === 0 ? '#9A9CA1' : t.amount,
+      types: TYPES.map(function (x, i) {
+        var on = st.type === i;
+        return { label: x.label, on: on ? 'true' : 'false', bg: on ? x.bg : 'transparent', fg: on ? x.fg : '#5F6168', shadow: on ? '0 1px 3px #16171A1F' : 'none', pick: function () { self.setState({ type: i }); } };
+      }),
+      cats: CATS.map(function (c) {
+        var on = st.cat === c.name;
+        return { name: c.name, mark: c.mark, color: c.color, tint: c.tint, on: on ? 'true' : 'false', bg: on ? '#FFFFFF' : '#F5F6F8', border: on ? '1.5px solid #DD4428' : '1.5px solid transparent', pick: function () { self.setState({ cat: c.name }); } };
+      }),
+      pays: PAYS.map(function (p) {
+        var on = st.pay === p;
+        return { name: p, on: on ? 'true' : 'false', bg: on ? '#FFF1EE' : '#FFFFFF', fg: on ? '#B93A22' : '#3A3C42', border: on ? '1px solid #DD4428' : '1px solid #E6E8EC', pick: function () { self.setState({ pay: p }); } };
+      }),
+      keys: keyList.map(function (k) {
+        return { label: k, isDel: k === 'del', isNum: k !== 'del', aria: k === 'del' ? '지우기' : k, press: function () { self.press(k); } };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

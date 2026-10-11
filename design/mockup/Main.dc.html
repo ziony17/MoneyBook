@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>홈</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#191B1F;text-decoration:none}a:hover{color:#000}
+button{font:inherit;color:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 1220px; position: relative; overflow: hidden; background: #F5F6F8; color: #191B1F; font-family: 'IBM Plex Sans KR', sans-serif; font-variant-numeric: tabular-nums; display: flex; flex-direction: column; gap: 12px; padding-bottom: 100px">
+
+<header style="display: flex; align-items: center; justify-content: space-between; padding: 14px 12px 0 12px">
+<div style="display: flex; align-items: center; gap: 2px">
+<button type="button" aria-label="이전 달" style="width: 44px; height: 44px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"></path></svg>
+</button>
+<h1 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em">2026년 10월</h1>
+<button type="button" aria-label="다음 달" style="width: 44px; height: 44px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+</button>
+</div>
+<button type="button" aria-label="검색" style="width: 44px; height: 44px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m20 20-4.2-4.2"></path></svg>
+</button>
+</header>
+
+<section style="margin: 0 16px; padding: 22px 20px 20px 20px; border-radius: 24px; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; gap: 4px">
+<div style="align-self: stretch; display: flex; justify-content: space-between; align-items: flex-start; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h2 style="margin: 0; font-size: 20px; font-weight: 700; line-height: 1.35; letter-spacing: -0.02em">현재 예산의<br><span style="color: #DD4428">72%</span>를 사용했어요</h2>
+<span style="font-size: 13px; color: #5F636B">남은 21일 동안 하루 19,600원씩 쓸 수 있어요</span>
+</div>
+<button type="button" style="flex: none; height: 32px; padding: 0 10px; border: 0; border-radius: 99px; background: #F0F1F4; font-size: 12px; font-weight: 500; cursor: pointer">예산 설정</button>
+</div>
+<div style="position: relative; width: 260px; height: 150px; margin-top: 14px">
+<svg width="260" height="150" viewBox="0 0 260 150" fill="none" role="img" aria-label="예산 72% 사용, 이번 달 35% 경과">
+<path d="M 20 135 A 110 110 0 0 1 240 135" stroke="#ECEDF1" stroke-width="18" stroke-linecap="round"></path>
+<path d="M 20 135 A 110 110 0 0 1 240 135" pathLength="100" stroke-dasharray="72.5 100" stroke="{{accent}}" stroke-width="18" stroke-linecap="round"></path>
+<line x1="76.3" y1="25.5" x2="86.9" y2="47.0" stroke="#191B1F" stroke-width="2.5" stroke-linecap="round"></line>
+</svg>
+<div style="position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); width: 92px; height: 92px; border-radius: 99px; border: 2px dashed #F5A090; background: #FFF1EE; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #B93A22; font-size: 12px; font-weight: 600">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><circle cx="9" cy="10.5" r="0.6" fill="currentColor"></circle><circle cx="15" cy="10.5" r="0.6" fill="currentColor"></circle><path d="M9 14.5c1.6 1.4 4.4 1.4 6 0"></path></svg>
+캐릭터
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #5F636B">
+<span style="width: 10px; height: 2.5px; border-radius: 2px; background: #191B1F"></span>
+<span>오늘 기준 적정 사용률 35%</span>
+</div>
+<div style="align-self: stretch; margin-top: 12px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; text-align: center">
+<div style="padding: 10px 4px; border-radius: 12px; background: #F5F6F8; display: flex; flex-direction: column; gap: 1px">
+<span style="font-size: 12px; color: #5F636B">남은 예산</span>
+<span style="font-size: 14px; font-weight: 700">412,300</span>
+</div>
+<div style="padding: 10px 4px; border-radius: 12px; background: #F5F6F8; display: flex; flex-direction: column; gap: 1px">
+<span style="font-size: 12px; color: #5F636B">쓴 돈</span>
+<span style="font-size: 14px; font-weight: 700; color: #D63B26">1,087,700</span>
+</div>
+<div style="padding: 10px 4px; border-radius: 12px; background: #F5F6F8; display: flex; flex-direction: column; gap: 1px">
+<span style="font-size: 12px; color: #5F636B">예산</span>
+<span style="font-size: 14px; font-weight: 700">1,500,000</span>
+</div>
+</div>
+</section>
+
+<div style="display: flex; gap: 10px; padding: 0 16px; overflow: hidden">
+<sc-for list="{{insights}}" as="n" hint-placeholder-count="3">
+<article style="flex: none; width: 264px; padding: 16px 18px; border-radius: 20px; background: #FFFFFF; display: flex; flex-direction: column; gap: 8px">
+<span style="align-self: flex-start; padding: 3px 9px; border-radius: 99px; font-size: 11px; font-weight: 600; background: {{n.tagBg}}; color: {{n.tagFg}}">{{n.tag}}</span>
+<p style="margin: 0; font-size: 15px; font-weight: 600; line-height: 1.4">{{n.title}}</p>
+<p style="margin: 0; font-size: 13px; color: #5F636B; line-height: 1.4">{{n.sub}}</p>
+</article>
+</sc-for>
+</div>
+
+<section style="margin: 0 16px; padding: 18px 20px; border-radius: 24px; background: #FFFFFF; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">카테고리 예산</h2>
+<a href="Stats.dc.html" style="font-size: 13px; color: #5F636B">전체 보기</a>
+</div>
+<sc-for list="{{budgets}}" as="b" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 7px">
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="width: 30px; height: 30px; border-radius: 10px; flex: none; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; background: {{b.tint}}; color: {{b.color}}">{{b.mark}}</span>
+<span style="flex: 1; font-size: 14px; font-weight: 500">{{b.name}}</span>
+<span style="font-size: 12px; font-weight: 600; color: {{b.noteColor}}">{{b.note}}</span>
+</div>
+<div style="height: 8px; border-radius: 99px; background: #ECEDF1; overflow: hidden">
+<div style="height: 100%; border-radius: 99px; width: {{b.w}}%; background: {{b.bar}}"></div>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: #5F636B">
+<span>{{b.used}}</span>
+<span>{{b.limit}}</span>
+</div>
+</div>
+</sc-for>
+</section>
+
+<section style="margin: 0 16px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; padding: 0 4px">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">오늘 · 10월 11일</h2>
+<span style="font-size: 13px; color: #5F636B">-15,250원</span>
+</div>
+<div style="background: #FFFFFF; border-radius: 20px; padding: 4px 14px">
+<sc-for list="{{today}}" as="t" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 12px; padding: 11px 0">
+<div style="width: 40px; height: 40px; flex: none; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; background: {{t.tint}}; color: {{t.color}}">{{t.mark}}</div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+<span style="font-size: 15px; font-weight: 500">{{t.title}}</span>
+<span style="font-size: 13px; color: #5F636B">{{t.sub}}</span>
+</div>
+<span style="font-size: 15px; font-weight: 600">{{t.amount}}</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<nav aria-label="주요 메뉴" style="position: absolute; left: 0; right: 0; bottom: 0; height: 82px; padding-bottom: 14px; background: #FFFFFF; border-top: 1px solid #E6E8EC; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center">
+<a href="Main.dc.html" aria-current="page" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; font-weight: 600; color: #191B1F">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"></path></svg>홈</a>
+<a href="Calendar.dc.html" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: #6B6E75">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="2.5"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>달력</a>
+<a href="Input.dc.html" aria-label="내역 추가" style="justify-self: center; width: 54px; height: 54px; margin-top: -18px; border-radius: 99px; background: #DD4428; color: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px #DD442855">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+</a>
+<a href="Stats.dc.html" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: #6B6E75">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20v-8M12 20V5M19 20v-5"></path></svg>통계</a>
+<button type="button" style="height: 100%; border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: #6B6E75; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg>더보기</button>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#F25A40","options":["#F25A40","#4F7CFF","#2FB58A","#8B5CF6"]},"$preview":{"width":390,"height":1220}}'>
+var CATS = {
+  '식비': { mark: '식', color: '#C4612A', tint: '#E07A3F1F', bar: '#E07A3F' },
+  '카페': { mark: '카', color: '#875A40', tint: '#9A6B4F1F', bar: '#9A6B4F' },
+  '교통': { mark: '교', color: '#2F5FC4', tint: '#3A6FD81F', bar: '#3A6FD8' },
+  '쇼핑': { mark: '쇼', color: '#7448BD', tint: '#8A5CD11F', bar: '#8A5CD1' }
+};
+function n(v) { return v.toLocaleString('ko-KR'); }
+function row(title, cat, pay, amt) {
+  var c = CATS[cat];
+  return { title: title, sub: cat + ' · ' + pay, mark: c.mark, color: c.color, tint: c.tint, amount: '-' + n(amt) };
+}
+function budget(name, used, limit) {
+  var c = CATS[name], p = used / limit * 100, over = used > limit;
+  return {
+    name: name, mark: c.mark, color: c.color, tint: c.tint,
+    bar: over ? '#D63B26' : c.bar, w: Math.min(100, p).toFixed(1),
+    used: n(used) + '원 사용', limit: '예산 ' + n(limit) + '원',
+    note: over ? n(used - limit) + '원 초과' : Math.round(p) + '%',
+    noteColor: over ? '#D63B26' : '#3A3C42'
+  };
+}
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      accent: this.props.accent ?? '#F25A40',
+      insights: [
+        { tag: '예산 속도', tagBg: '#FFF1EE', tagFg: '#B93A22', title: '예산을 평소보다 빨리 쓰고 있어요', sub: '이번 달 35%가 지났는데 예산의 72%를 썼어요' },
+        { tag: '쇼핑', tagBg: '#8A5CD11F', tagFg: '#7448BD', title: '쇼핑 예산을 18,000원 넘었어요', sub: '겨울 아우터 189,000원이 가장 컸어요' },
+        { tag: '카페', tagBg: '#2457C514', tagFg: '#2457C5', title: '카페 지출이 지난달보다 줄었어요', sub: '같은 기간 대비 12,300원 아꼈어요' }
+      ],
+      budgets: [budget('식비', 342500, 400000), budget('쇼핑', 218000, 200000), budget('카페', 98400, 150000)],
+      today: [row('점심 김치찌개', '식비', '신한카드', 9000), row('스타벅스 아메리카노', '카페', '현대카드', 4700), row('지하철', '교통', '토스 체크', 1550)]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>통계</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#16171A;text-decoration:none}a:hover{color:#000}
+button{font:inherit;color:inherit}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #F5F6F8; color: #16171A; font-family: 'IBM Plex Sans KR', sans-serif; font-variant-numeric: tabular-nums; display: flex; flex-direction: column; gap: 10px; padding-bottom: 92px">
+
+<header style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 0 20px; height: 58px">
+<h1 style="margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -0.02em">10월 통계</h1>
+<div role="tablist" aria-label="통계 종류" style="padding: 3px; border-radius: 12px; background: #ECEDF1; display: flex; gap: 2px">
+<sc-for list="{{tabs}}" as="s" hint-placeholder-count="2">
+<button type="button" role="tab" aria-selected="{{s.on}}" onClick="{{s.pick}}" style="height: 34px; padding: 0 14px; border: 0; border-radius: 9px; font-size: 13px; font-weight: 600; cursor: pointer; background: {{s.bg}}; color: {{s.fg}}">{{s.label}}</button>
+</sc-for>
+</div>
+</header>
+
+<section style="margin: 0 16px; padding: 20px; border-radius: 22px; background: #FFFFFF; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 18px; font-weight: 700; line-height: 1.35; letter-spacing: -0.02em; margin-bottom: 6px">{{headline}}</span>
+<span style="font-size: 13px; color: #5F6168">{{totalLabel}}</span>
+<span style="font-size: 30px; font-weight: 700; letter-spacing: -0.03em">{{total}}</span>
+<span style="align-self: flex-start; margin-top: 6px; padding: 5px 10px; border-radius: 99px; background: #2457C514; color: #2457C5; font-size: 12px; font-weight: 600">{{compare}}</span>
+</div>
+<div style="flex: none; width: 76px; height: 76px; border-radius: 99px; border: 2px dashed #F5A090; background: #FFF1EE; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: #B93A22; font-size: 11px; font-weight: 600">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><circle cx="9" cy="10.5" r="0.6" fill="currentColor"></circle><circle cx="15" cy="10.5" r="0.6" fill="currentColor"></circle><path d="M9 14.5c1.6 1.4 4.4 1.4 6 0"></path></svg>
+캐릭터
+</div>
+</div>
+<div role="img" aria-label="카테고리별 비율" style="height: 14px; border-radius: 99px; overflow: hidden; display: flex; gap: 2px">
+<sc-for list="{{cats}}" as="c" hint-placeholder-count="8">
+<div style="height: 100%; width: {{c.pct}}%; background: {{c.bar}}"></div>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column">
+<sc-for list="{{top}}" as="c" hint-placeholder-count="6">
+<div style="display: flex; align-items: center; gap: 12px; padding: 8px 0">
+<div style="width: 34px; height: 34px; flex: none; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; background: {{c.tint}}; color: {{c.color}}">{{c.mark}}</div>
+<span style="flex: 1; font-size: 15px; font-weight: 500">{{c.name}} <span style="font-size: 13px; font-weight: 400; color: #5F6168; margin-left: 4px">{{c.pctText}}</span></span>
+<span style="font-size: 15px; font-weight: 600">{{c.amount}}</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="margin: 0 16px; padding: 18px 20px; border-radius: 22px; background: #FFFFFF; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<h2 style="margin: 0; font-size: 15px; font-weight: 600">월별 지출</h2>
+<span style="font-size: 12px; color: #5F6168">최근 6개월</span>
+</div>
+<div role="img" aria-label="최근 6개월 월별 지출 막대그래프" style="height: 110px; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; align-items: end">
+<sc-for list="{{months}}" as="m" hint-placeholder-count="6">
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; height: 100%">
+<span style="font-size: 10px; color: #5F6168">{{m.short}}</span>
+<div style="width: 100%; max-width: 28px; border-radius: 8px; height: {{m.h}}px; background: {{m.bg}}"></div>
+<span style="font-size: 12px; font-weight: {{m.weight}}; color: {{m.fg}}">{{m.label}}</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<nav aria-label="주요 메뉴" style="position: absolute; left: 0; right: 0; bottom: 0; height: 82px; padding-bottom: 14px; background: #FFFFFF; border-top: 1px solid #E6E8EC; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center">
+<a href="Main.dc.html" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: #6B6E75">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6h-4v6H5a1 1 0 0 1-1-1z"></path></svg>홈</a>
+<a href="Calendar.dc.html" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: #6B6E75">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="2.5"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>달력</a>
+<a href="Input.dc.html" aria-label="내역 추가" style="justify-self: center; width: 54px; height: 54px; margin-top: -18px; border-radius: 99px; background: #DD4428; color: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 16px #DD442855">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+</a>
+<a href="Stats.dc.html" aria-current="page" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; font-weight: 600; color: #16171A">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 20v-8M12 20V5M19 20v-5"></path></svg>통계</a>
+<button type="button" style="height: 100%; border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; color: #6B6E75; cursor: pointer">
+<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"></circle><circle cx="12" cy="12" r="1.7"></circle><circle cx="19" cy="12" r="1.7"></circle></svg>더보기</button>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+var EXP = [
+  { name: '식비', mark: '식', color: '#C4612A', tint: '#E07A3F1F', bar: '#E07A3F', amt: 342500 },
+  { name: '쇼핑', mark: '쇼', color: '#7448BD', tint: '#8A5CD11F', bar: '#8A5CD1', amt: 218000 },
+  { name: '생활', mark: '생', color: '#21806F', tint: '#2E9A8A1F', bar: '#2E9A8A', amt: 164300 },
+  { name: '카페', mark: '카', color: '#875A40', tint: '#9A6B4F1F', bar: '#9A6B4F', amt: 98400 },
+  { name: '교통', mark: '교', color: '#2F5FC4', tint: '#3A6FD81F', bar: '#3A6FD8', amt: 86500 },
+  { name: '문화', mark: '문', color: '#B83D69', tint: '#D04F7D1F', bar: '#D04F7D', amt: 72000 },
+  { name: '기타', mark: '기', color: '#5F6168', tint: '#8A8D931F', bar: '#B4B6BA', amt: 58000 },
+  { name: '의료', mark: '의', color: '#4E7A2E', tint: '#5E8C3A1F', bar: '#5E8C3A', amt: 48000 }
+];
+var INC = [
+  { name: '월급', mark: '월', color: '#2457C5', tint: '#2457C51A', bar: '#2457C5', amt: 3200000 }
+];
+var MONTHS = [
+  { label: '5월', v: 1312000 }, { label: '6월', v: 1205000 }, { label: '7월', v: 1436000 },
+  { label: '8월', v: 1298000 }, { label: '9월', v: 1184000 }, { label: '10월', v: 1087700 }
+];
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { tab: 0 };
+  }
+  renderVals() {
+    var self = this, tab = this.state.tab;
+    var list = tab === 0 ? EXP : INC;
+    var sum = list.reduce(function (a, c) { return a + c.amt; }, 0);
+    var cats = list.map(function (c) {
+      var p = c.amt / sum * 100;
+      return { name: c.name, mark: c.mark, color: c.color, tint: c.tint, bar: c.bar, pct: p.toFixed(2), pctText: Math.round(p) + '%', amount: c.amt.toLocaleString('ko-KR') + '원' };
+    });
+    var max = Math.max.apply(null, MONTHS.map(function (m) { return m.v; }));
+    return {
+      tabs: ['지출', '수입'].map(function (l, i) {
+        var on = tab === i;
+        return { label: l, on: on ? 'true' : 'false', bg: on ? '#FFFFFF' : 'transparent', fg: on ? '#16171A' : '#5F6168', pick: function () { self.setState({ tab: i }); } };
+      }),
+      headline: tab === 0 ? '식비에 가장 많이 썼어요' : '이번 달 월급이 들어왔어요',
+      totalLabel: tab === 0 ? '이번 달 지출' : '이번 달 수입',
+      total: sum.toLocaleString('ko-KR') + '원',
+      compare: tab === 0 ? '지난달 이맘때보다 64,200원 덜 썼어요' : '지난달과 같아요',
+      cats: cats,
+      top: cats.slice(0, 6),
+      months: MONTHS.map(function (m, i) {
+        var last = i === MONTHS.length - 1;
+        return { label: m.label, short: Math.round(m.v / 10000) + '만', h: Math.round(m.v / max * 64), bg: last ? '#F25A40' : '#E1E3E8', fg: last ? '#16171A' : '#5F6168', weight: last ? '600' : '400' };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>
