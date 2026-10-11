@@ -157,6 +157,12 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--ac); outlin
 .inrow .field.num { width: 130px; text-align: right; flex: none; }
 .inrow > span:last-child { color: var(--muted); font-size: 13px; }
 .addfx { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, .8fr); gap: 6px; }
+.av.xl { width: 72px; height: 72px; font-size: 26px; }
+.pf-top { display: flex; align-items: center; gap: 16px; }
+.pf-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+.swatches { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; }
+.swatch-btn { aspect-ratio: 1; max-width: 100%; border: 0; border-radius: 99px; color: #fff; display: flex; align-items: center; justify-content: center; }
+.swatch-btn[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--card), 0 0 0 5px var(--fg); }
 .cell .n { color: var(--inc); font-weight: 600; }
 .ns { display: flex; align-items: center; gap: 10px; margin: 0 16px 14px; padding: 14px; border-radius: 18px; background: var(--card); border: 1.5px dashed var(--line); font-size: 14px; }
 .ns.on { border-style: solid; border-color: transparent; background: #E2F5EC; color: #0B6B47; }
@@ -352,7 +358,12 @@ function calc(b) {
 }
 function bookTx() { return tx.filter(function (t) { return t.book === S.book && (S.who === 'all' || t.who === S.who); }); }
 function sum(list, type) { return list.filter(function (t) { return t.type === type; }).reduce(function (a, t) { return a + t.amt; }, 0); }
-function av(id, cls) { var m = MEMBERS[id]; return '<span class="av ' + (cls || '') + '" style="background:' + m.color + '" aria-label="' + m.name + '">' + m.name[0] + '</span>'; }
+function avOf(m, cls) {
+  if (m.photo) return '<span class="av ' + (cls || '') + '" role="img" style="background:' + m.color + ' center/cover no-repeat url(' + m.photo + ')" aria-label="' + esc(m.name) + '"></span>';
+  return '<span class="av ' + (cls || '') + '" style="background:' + m.color + '" aria-label="' + esc(m.name) + '">' + esc(m.name[0] || '?') + '</span>';
+}
+function av(id, cls) { return avOf(MEMBERS[id], cls); }
+var PCOLORS = ['#7C5CFA', '#E5487A', '#F08A24', '#D4A20B', '#12A16B', '#0E9FB0', '#2F6FE0', '#5E6470'];
 function mark(cat, size) { var c = CATS[cat]; return '<span class="mark" style="background:' + c.t + ';color:' + c.c + (size ? ';width:' + size + 'px;height:' + size + 'px;font-size:13px;border-radius:12px' : '') + '">' + cat[0] + '</span>'; }
 var I = {
   left: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg>',
@@ -542,7 +553,7 @@ function viewMy() {
   }).join('');
   function tog(k, label, sub) { return '<li><button data-act="alert" data-v="' + k + '" role="switch" aria-checked="' + S.alerts[k] + '"><span class="grow">' + label + '<br><span class="muted small">' + sub + '</span></span><span class="toggle" aria-checked="' + S.alerts[k] + '"></span></button></li>'; }
   return '<div class="top"><h1 class="title" style="padding-left:6px">마이페이지</h1><button class="icon-btn" data-act="open" data-v="notis" aria-label="알림">' + I.bell + '</button></div>' +
-    '<section class="card"><div class="profile">' + av('me') + '<div style="flex:1"><b style="font-size:17px">지은</b> <span class="plan">무료</span><br><span class="muted small">jieun@example.com</span></div></div>' +
+    '<section class="card"><div class="profile">' + av('me') + '<div style="flex:1;min-width:0"><b style="font-size:17px">' + esc(MEMBERS.me.name) + '</b> <span class="plan">무료</span><br><span class="muted small">jieun@example.com</span></div><button class="set-btn" style="margin:0" data-act="openProfile">프로필 편집</button></div>' +
     '<div class="trio"><div><span>내 무지출 데이</span><b>' + nsCount + '일</b></div><div><span>이번 달 기록</span><b>' + tx.filter(function (t) { return t.who === 'me'; }).length + '건</b></div><div><span>모은 콩</span><b>128개</b></div></div>' +
     '<p class="muted small" style="margin:10px 0 0">기록이 없는 날이 아니라, <b>‘오늘 지출 없음’을 직접 체크한 날</b>만 세요. 체크할 때마다 콩을 받아요.</p></section>' +
     '<section class="card"><div class="card-head"><h2>내 가계부</h2></div><ul class="menu">' + books.map(function (b) {
@@ -559,6 +570,17 @@ function sheetBooks() {
   return '<div class="overlay" data-act="close"><div class="sheet" role="dialog" aria-label="가계부 선택" data-stop><div class="grab"></div><h2 class="title" style="font-size:17px">가계부 선택</h2><ul class="menu">' +
     books.map(function (b) { return '<li><button data-act="book" data-v="' + b.id + '"><span class="stack-av">' + b.members.map(function (m) { return av(m, 'sm'); }).join('') + '</span><span class="grow">' + esc(b.name) + '</span>' + (b.id === S.book ? '<span style="color:var(--ac)">' + I.ok + '</span>' : '') + '</button></li>'; }).join('') +
     '<li><button data-act="open" data-v="newBook"><span class="sys" aria-hidden="true">+</span><span class="grow">새 가계부 만들기</span></button></li></ul></div></div>';
+}
+function sheetProfile() {
+  var d = S.pf, other = MEMBERS.hw;
+  return '<div class="overlay" data-act="close"><div class="sheet" role="dialog" aria-label="프로필 편집" data-stop><div class="grab"></div><h2 class="title" style="font-size:17px">프로필 편집</h2>' +
+    '<div class="pf-top">' + avOf({ name: d.name || '?', color: d.color, photo: d.photo }, 'xl') +
+    '<div class="pf-btns"><label class="pill" for="pf-file" style="cursor:pointer">사진 선택</label><input id="pf-file" type="file" accept="image/*" class="sr" data-file="photo">' +
+    (d.photo ? '<button class="pill" data-act="pfNoPhoto">사진 지우기</button>' : '') + '</div></div>' +
+    '<label class="label" for="pf-name">닉네임</label><div class="inrow"><input id="pf-name" class="field" maxlength="10" data-input="pfName" value="' + esc(d.name) + '" placeholder="가족에게 보일 이름"><span id="pf-count">' + d.name.length + '/10</span></div>' +
+    '<span class="label">내 색</span><div class="swatches">' + PCOLORS.map(function (c) { return '<button class="swatch-btn" data-act="pfColor" data-v="' + c + '" aria-pressed="' + (d.color === c) + '" aria-label="색 ' + c + '" style="background:' + c + '">' + (d.color === c ? I.ok : '') + '</button>'; }).join('') + '</div>' +
+    '<p class="muted small" style="margin:0">함께 쓰는 가계부에서 내가 쓴 내역을 이 색과 사진으로 구분해요.' + (d.color === other.color ? ' <b style="color:var(--exp)">' + esc(other.name) + '님과 같은 색이에요.</b>' : '') + '</p>' +
+    '<button class="primary" data-act="pfSave">저장하기</button></div></div>';
 }
 function sheetNewBook() {
   var n = S.newBook;
@@ -640,7 +662,7 @@ function render(keepScroll) {
     [['home', '홈', I.cal], ['budget', '예산', I.gauge.replace(/16/g, '24').replace('stroke-width="2"', 'stroke-width="1.8"')]].map(function (x) { return '<button data-act="tab" data-v="' + x[0] + '"' + (S.tab === x[0] ? ' aria-current="page"' : '') + '>' + x[2] + x[1] + '</button>'; }).join('') +
     '<button class="plus" data-act="openInput" aria-label="내역 추가">' + I.plus + '</button>' +
     [['stats', '통계', I.stat], ['my', '마이', I.me]].map(function (x) { return '<button data-act="tab" data-v="' + x[0] + '"' + (S.tab === x[0] ? ' aria-current="page"' : '') + '>' + x[2] + x[1] + '</button>'; }).join('') + '</nav>';
-  var over = { budget: fullBudget, books: sheetBooks, newBook: sheetNewBook, invite: sheetInvite, notis: fullNotis, input: sheetInput, settle: fullSettle }[S.over];
+  var over = { profile: sheetProfile, budget: fullBudget, books: sheetBooks, newBook: sheetNewBook, invite: sheetInvite, notis: fullNotis, input: sheetInput, settle: fullSettle }[S.over];
   var po = app.querySelector('.sheet, .full .body'), overScroll = po && S.over === shownOver ? po.scrollTop : 0;
   app.innerHTML = '<div class="body">' + view + '</div>' + nav + (over ? over() : '') + (S.toast ? '<div class="toast" role="status">' + S.toast + '</div>' : '');
   var nb = app.querySelector('.body'); if (nb && keepScroll) nb.scrollTop = scrollKeep;
@@ -668,6 +690,13 @@ app.addEventListener('click', function (e) {
     case 'closeNotis': notis.forEach(function (n) { n.unread = false; }); S.over = null; break;
     case 'book': S.book = v; S.who = 'all'; S.over = null; toast(esc(book().name) + '(으)로 바꿨어요'); break;
     case 'calSel': S.calSel = +v; break;
+    case 'openProfile': S.pf = { name: MEMBERS.me.name, color: MEMBERS.me.color, photo: MEMBERS.me.photo || '' }; S.over = 'profile'; break;
+    case 'pfColor': S.pf.color = v; break;
+    case 'pfNoPhoto': S.pf.photo = ''; break;
+    case 'pfSave':
+      var nn = S.pf.name.trim();
+      if (!nn) { toast('닉네임을 입력해 주세요'); break; }
+      MEMBERS.me.name = nn; MEMBERS.me.color = S.pf.color; MEMBERS.me.photo = S.pf.photo; S.over = null; toast('프로필을 저장했어요'); break;
     case 'openBudget':
       var bb = book();
       S.bd = { budget: String(bb.budget), cats: {}, limits: {}, fixed: (bb.fixed || []).map(function (f) { return { name: f.name, amt: f.amt, day: f.day, cat: f.cat }; }), nf: { name: '', amt: '', day: '' } };
@@ -730,7 +759,16 @@ app.addEventListener('click', function (e) {
   }
   render(keep);
 });
+app.addEventListener('change', function (e) {
+  if (e.target.dataset.file !== 'photo' || !e.target.files || !e.target.files[0]) return;
+  var f = e.target.files[0];
+  if (!/^image\//.test(f.type)) { toast('이미지 파일을 골라 주세요'); render(true); return; }
+  var r = new FileReader();
+  r.onload = function () { S.pf.photo = r.result; render(true); };
+  r.readAsDataURL(f);
+});
 app.addEventListener('input', function (e) {
+  if (e.target.dataset.input === 'pfName') { S.pf.name = e.target.value; var pc = document.getElementById('pf-count'); if (pc) pc.textContent = e.target.value.length + '/10'; return; }
   var k = e.target.dataset.input;
   if (k === 'memo') S.input.memo = e.target.value;
   if (k === 'nbName') S.newBook.name = e.target.value;
